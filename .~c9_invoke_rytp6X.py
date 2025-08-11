@@ -8,54 +8,12 @@ import logging
 
 app = Flask(__name__)
 
-BG_IMAGE_URL = os.environ.get("BG_IMAGE_URL")
-AWS_ACCESS_KEY_ID = os.environ.get("AWS_ACCESS_KEY_ID")
-AWS_SECRET_ACCESS_KEY = os.environ.get("AWS_SECRET_ACCESS_KEY")
-AWS_SESSION_TOKEN = os.environ.get("AWS_SESSION_TOKEN")
-AWS_REGION = os.environ.get("AWS_REGION", "us-east-1")
-LOCAL_BG_IMAGE_PATH = 'static/bg_image.jpg'
-
-GROUP_NAME = os.environ.get("GROUP_NAME", "Default Group")
-SLOGAN = os.environ.get("SLOGAN", "Your slogan here")
-
 DBHOST = os.environ.get("DBHOST") or "localhost"
 DBUSER = os.environ.get("DBUSER") or "root"
 DBPWD = os.environ.get("DBPWD") or "passwors"
 DATABASE = os.environ.get("DATABASE") or "employees"
 COLOR_FROM_ENV = os.environ.get('APP_COLOR') or "lime"
-#DBPORT = int(os.environ.get("DBPORT"))
-DBPORT = int(os.environ.get("DBPORT") or 3306)
-
-def download_bg_image():
-    if not BG_IMAGE_URL:
-        logging.warning("No background image URL provided")
-        return
-    logging.info(f"Downloading background image from: {BG_IMAGE_URL}")
-    
-    os.makedirs(os.path.dirname(LOCAL_BG_IMAGE_PATH), exist_ok=True)
-    
-    # Extract bucket name and key from the S3 URL, assuming format s3://bucket/key or https://bucket.s3... 
-    import re
-    s3_pattern = r's3://([^/]+)/(.+)'
-    match = re.match(s3_pattern, BG_IMAGE_URL)
-    if not match:
-        logging.error("Invalid BG_IMAGE_URL format")
-        return
-    bucket, key = match.groups()
-    
-    s3 = boto3.client(
-        's3',
-        aws_access_key_id=AWS_ACCESS_KEY_ID,
-        aws_secret_access_key=AWS_SECRET_ACCESS_KEY,
-        aws_session_token=AWS_SESSION_TOKEN,
-        region_name=AWS_REGION
-    )
-    try:
-        s3.download_file(bucket, key, LOCAL_BG_IMAGE_PATH)
-        logging.info(f"Background image downloaded to {LOCAL_BG_IMAGE_PATH}")
-    except Exception as e:
-        logging.error(f"Failed to download background image: {e}")
-
+DBPORT = int(os.environ.get("DBPORT"))
 
 # Create a connection to the MySQL database
 db_conn = connections.Connection(
@@ -66,7 +24,6 @@ db_conn = connections.Connection(
     db= DATABASE
     
 )
-
 output = {}
 table = 'employee';
 
@@ -88,19 +45,14 @@ SUPPORTED_COLORS = ",".join(color_codes.keys())
 # Generate a random color
 COLOR = random.choice(["red", "green", "blue", "blue2", "darkblue", "pink", "lime"])
 
-background_url = '/static/bg_image.jpg'
 
 @app.route("/", methods=['GET', 'POST'])
 def home():
-    return render_template('addemp.html', color=color_codes[COLOR], background_image_url=background_url,
-                           group_name=GROUP_NAME,
-                           slogan=SLOGAN)
+    return render_template('addemp.html', color=color_codes[COLOR])
 
 @app.route("/about", methods=['GET','POST'])
 def about():
-    return render_template('about.html', color=color_codes[COLOR], background_image_url=background_url,
-                           group_name=GROUP_NAME,
-                           slogan=SLOGAN)
+    return render_template('about.html', color=color_codes[COLOR])
     
 @app.route("/addemp", methods=['POST'])
 def AddEmp():
@@ -122,19 +74,13 @@ def AddEmp():
 
     finally:
         cursor.close()
-    
-    # emp_name = "Test User"
 
     print("all modification done...")
-    return render_template('addempoutput.html', name=emp_name, color=color_codes[COLOR], background_image_url=background_url,
-                           group_name=GROUP_NAME,
-                           slogan=SLOGAN)
+    return render_template('addempoutput.html', name=emp_name, color=color_codes[COLOR])
 
 @app.route("/getemp", methods=['GET', 'POST'])
 def GetEmp():
-    return render_template("getemp.html", color=color_codes[COLOR], background_image_url=background_url,
-                           group_name=GROUP_NAME,
-                           slogan=SLOGAN)
+    return render_template("getemp.html", color=color_codes[COLOR])
 
 
 @app.route("/fetchdata", methods=['GET','POST'])
@@ -163,15 +109,9 @@ def FetchData():
         cursor.close()
 
     return render_template("getempoutput.html", id=output["emp_id"], fname=output["first_name"],
-                          lname=output["last_name"], interest=output["primary_skills"], location=output["location"],
-                          color=color_codes[COLOR], background_image_url=background_url,
-                           group_name=GROUP_NAME,
-                           slogan=SLOGAN)
-    # return render_template("getempoutput.html", id="1", fname="Test", lname="User", interest="Testing", location="Local", color=color_codes[COLOR], background_image_url=background_url)
+                           lname=output["last_name"], interest=output["primary_skills"], location=output["location"], color=color_codes[COLOR])
+
 if __name__ == '__main__':
-    
-    logging.basicConfig(level=logging.INFO)
-    download_bg_image()
     
     # Check for Command Line Parameters for color
     parser = argparse.ArgumentParser()

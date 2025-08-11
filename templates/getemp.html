@@ -8,7 +8,11 @@
 
 		<h1 style="color: DodgerBlue">Employee Information</h1>
 
-		<body style="background: {{ color }};">
+		<body style="background-image: url('{{ background_image_url }}'); background-size: cover;">
+			<header>
+  <h1>{{ group_name }}</h1>
+  <p><em>{{ slogan }}</em></p>
+</header>
 
 			<form action="/fetchdata" autocomplete="on" method="POST">
 
