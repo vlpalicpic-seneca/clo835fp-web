@@ -1,4 +1,4 @@
-# CLO835 - Assignment 2 
+# CLO835 - Final Project
 ```
 Ven Louie Palicpic - 159295237
 vlpalicpic@myseneca.ca

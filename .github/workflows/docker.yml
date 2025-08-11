@@ -26,12 +26,12 @@ jobs:
 
       - name: Build and push Web App image
         run: |
-          WEBAPP_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835a2-webapp
-          docker build -t $WEBAPP_IMAGE_URI:v2 .
-          docker push $WEBAPP_IMAGE_URI:v2
+          WEBAPP_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835fp-web
+          docker build -t $WEBAPP_IMAGE_URI:latest .
+          docker push $WEBAPP_IMAGE_URI:latest
 
       - name: Build and push MySQL image
         run: |
-          MYSQL_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835a2-mysql
-          docker build -f Dockerfile_mysql -t $MYSQL_IMAGE_URI:v2 .
-          docker push $MYSQL_IMAGE_URI:v2
+          MYSQL_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835fp-mysql
+          docker build -f Dockerfile_mysql -t $MYSQL_IMAGE_URI:latest .
+          docker push $MYSQL_IMAGE_URI:latest
