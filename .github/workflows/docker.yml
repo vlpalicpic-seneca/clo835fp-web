@@ -1,0 +1,37 @@
+name: Build and Push Docker Images
+
+on:
+  push:
+    branches:
+      - main  # trigger workflow on pushes to main branch
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Configure AWS credentials
+        uses: aws-actions/configure-aws-credentials@v2
+        with:
+          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws-session-token: ${{ secrets.AWS_SESSION_TOKEN }}
+          aws-region: us-east-1
+
+      - name: Login to Amazon ECR
+        uses: aws-actions/amazon-ecr-login@v1
+
+      - name: Build and push Web App image
+        run: |
+          WEBAPP_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835a2-webapp
+          docker build -t $WEBAPP_IMAGE_URI:v2 .
+          docker push $WEBAPP_IMAGE_URI:v2
+
+      - name: Build and push MySQL image
+        run: |
+          MYSQL_IMAGE_URI=998727131331.dkr.ecr.us-east-1.amazonaws.com/clo835a2-mysql
+          docker build -f Dockerfile_mysql -t $MYSQL_IMAGE_URI:v2 .
+          docker push $MYSQL_IMAGE_URI:v2
