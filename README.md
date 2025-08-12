@@ -2,4 +2,6 @@
 ```
 Ven Louie Palicpic - 159295237
 vlpalicpic@myseneca.ca
+Team VLP
+Finish Strong!
 ```
